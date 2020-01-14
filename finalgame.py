@@ -36,9 +36,9 @@ def mouse_in_box_game(compare):
     for i in range(len(cards)):
         if ((pos_card[0]+40) > mouse_pos[0]> (pos_card[0]) and (pos_card[1]+70) > mouse_pos[1]> (pos_card[1])):
             if ((pos_card[0], pos_card[1]) not in ban_list):
-                # pygame.draw.rect(screen,(0,0,0), (pos_card[0], pos_card[1], 40, 70), 1)
                 if (mouse_click[0]):
                     pygame.draw.rect(screen,colors[cards[i]], (pos_card[0], pos_card[1], 40, 70), 0)
+                    pygame.display.flip()
                     if ((pos_card[0], pos_card[1]) not in compare) :
                         compare.append(cards[i])
                         compare.append((pos_card[0], pos_card[1]))
@@ -58,7 +58,7 @@ def menu_creation():
     while x < 7:
                  
         pygame.draw.rect(screen,(0,0,0), (pos_button[0], pos_button[1], 100, 20), 1)
-        my_font.render_to(screen, (pos_button[0] + 33,pos_button[1] + 5), ("%s x %s" % (menu_numbers[0], menu_numbers[1])), (150,0,150))
+        my_font.render_to(screen, (pos_button[0] + 33,pos_button[1] + 5), ("%s x %s" % (menu_numbers[0], menu_numbers[1])), (200,50,0))
         pos_button[1] += 40
         
         if menu_numbers[0] < menu_numbers[1]:
@@ -130,10 +130,20 @@ board = False
 pos_button = [270,240]
 clicked = False
 
+previous_mouse_press = [ False, False, False ]
+mouse_click = [ False, False, False ]
+
 while (True):
 
     mouse_pos = pygame.mouse.get_pos()
-    mouse_click = pygame.mouse.get_pressed()
+    current_mouse_press = pygame.mouse.get_pressed()
+
+    for i in range(len(mouse_click)):
+        if (previous_mouse_press[i] != current_mouse_press[i]):
+            mouse_click[i] = current_mouse_press[i]
+        else:
+            mouse_click[i] = False
+        previous_mouse_press[i] = current_mouse_press[i]
 
     for event in pygame.event.get():
         if (event.type == pygame.QUIT):
@@ -177,19 +187,19 @@ while (True):
             card_board()
 
             my_font = pygame.freetype.Font("comic.ttf", 24)
-            p_score = my_font.render_to(screen,(500,20),("Score : %s" % score),(150,0,150))
+            p_score = my_font.render_to(screen,(500,20),("Score : %s" % score),(200,50,0))
             my_font = pygame.freetype.Font("comic.ttf", 15)
 
             pygame.draw.rect(screen,(0,0,0), (520, 400, 60, 20), 1)
             my_font.render_to(screen, (538,405), ("Exit"), (150,0,150))
             board = True
+            pygame.display.flip()
 
         compare = mouse_in_box_game(compare)
-        
-        pygame.display.flip()
 
         if (len(compare) == 4):
             if (compare[0] == compare[2]):
+                pygame.time.wait(500)
                 pygame.draw.rect(screen,(0,40,0), (compare[1][0], compare[1][1], 40, 70), 0)
                 ban_list.append((compare[1][0], compare[1][1]))
                 pygame.draw.rect(screen,(0,40,0), (compare[3][0], compare[3][1], 40, 70), 0)
@@ -201,10 +211,12 @@ while (True):
 
                 screen.fill((0, 40, 0), (500,20,200,40))
                 my_font = pygame.freetype.Font("comic.ttf", 24)
-                p_score = my_font.render_to(screen,(500,20),("Score : %s" % score),(150,0,150))
+                p_score = my_font.render_to(screen,(500,20),("Score : %s" % score),(200,50,0))
                 my_font = pygame.freetype.Font("comic.ttf", 15)
+                pygame.display.flip()
 
             else:
+                pygame.time.wait(500)
                 refresh_board()
                 compare = []
                 penality += 1
@@ -213,8 +225,9 @@ while (True):
                     score = 0
                 screen.fill((0, 40, 0), (500,20,200,40))
                 my_font = pygame.freetype.Font("comic.ttf", 24)
-                p_score = my_font.render_to(screen,(500,20),("Score : %s" % score),(150,0,150))
+                p_score = my_font.render_to(screen,(500,20),("Score : %s" % score),(200,50,0))
                 my_font = pygame.freetype.Font("comic.ttf", 15)
+                pygame.display.flip()
         
         if ((600) > mouse_pos[0] > (500) and (420) > mouse_pos[1]> (400) and mouse_click[0]):
             screen.fill((0,40,0))
