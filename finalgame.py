@@ -37,7 +37,14 @@ def mouse_in_box_game(compare):
         if ((pos_card[0]+40) > mouse_pos[0]> (pos_card[0]) and (pos_card[1]+70) > mouse_pos[1]> (pos_card[1])):
             if ((pos_card[0], pos_card[1]) not in ban_list):
                 if (mouse_click[0]):
-                    pygame.draw.rect(screen,colors[cards[i]], (pos_card[0], pos_card[1], 40, 70), 0)
+                    pygame.draw.rect(screen,(0,40,0), (pos_card[0], pos_card[1], 40, 70), 0)
+                    pygame.draw.rect(screen,colors[cards[i]][0], (pos_card[0], pos_card[1], 40, 70), 1)
+                    if(colors[cards[i]][1] == "square"):
+                        pygame.draw.rect(screen,colors[cards[i]][0], (pos_card[0]+10, pos_card[1]+25, 20, 20), 0)
+                    elif(colors[cards[i]][1] == "circle"):
+                        pygame.draw.circle(screen,colors[cards[i]][0], (pos_card[0]+20, pos_card[1]+35),10,0)
+                    elif(colors[cards[i]][1] == "triangle"):
+                        pygame.draw.polygon(screen,colors[cards[i]][0], ((pos_card[0]+20, pos_card[1]+25),(pos_card[0]+10, pos_card[1]+40),(pos_card[0]+30, pos_card[1]+40)),0)
                     pygame.display.flip()
                     if ((pos_card[0], pos_card[1]) not in compare) :
                         compare.append(cards[i])
@@ -114,7 +121,7 @@ screen = pygame.display.set_mode((640,480))
 my_font = pygame.freetype.Font("comic.ttf", 15)
 screen.fill((0, 40, 0))
 
-colors = [(255, 0 , 0), (0, 255, 0),(0, 0, 255),(0, 0, 0),(255, 255, 255),(0, 255, 255),(255, 255, 0),(255, 0, 255),(155, 155, 255),(255, 155, 155),(155, 255, 155),(140, 80, 200),(80, 140, 200),(140, 80, 200),(180,90,0),(0,90,180),(90,180,0),(90,90,100)]
+colors = [((255, 0 , 0),"square"),((255, 0 , 0),"circle"),((255, 0 , 0),"triangle"),((0,255 , 0),"square"),((0,255 , 0),"circle"),((0,255 , 0),"triangle"),((0,0 , 255),"square"),((0,0 , 255),"circle"),((0,0 , 255),"triangle"),((0,0 ,0),"square"),((0,0 , 0),"circle"),((0,0 , 0),"triangle"),((255,255 ,255),"square"),((255,255 ,255),"circle"),((255,255 ,255),"triangle"),((255,0 ,255),"square"),((255,0 ,255),"circle"),((255,0 ,255),"triangle")]
 
 level = 6
 score = 0
@@ -126,6 +133,9 @@ ban_list = []
 menu = True
 game_start = True
 board = False
+combo = 0
+tries = 0
+senpai = 0
 
 pos_button = [270,240]
 clicked = False
@@ -155,6 +165,9 @@ while (True):
             board = False
             level = 6
             score = 0
+            combo = 0
+            tries = 0
+            senpai = 0
             cards = []
 
             pos_button = [270,240]
@@ -165,6 +178,13 @@ while (True):
             ban_list = []
 
         level = mouse_in_box_menu(level)
+
+        if ((600) > mouse_pos[0] > (0) and (220) > mouse_pos[1]> (100) and mouse_click[0]):
+            senpai += 1
+            if (senpai == 3):
+                my_font = pygame.freetype.Font("comic.ttf", 18)
+                my_font.render_to(screen,(300,10),("S-Stop clicking on me ... BAKANO !!"),(200,50,0))
+                my_font = pygame.freetype.Font("comic.ttf", 15)
 
         if (clicked):
             clicked = False
@@ -187,7 +207,9 @@ while (True):
             card_board()
 
             my_font = pygame.freetype.Font("comic.ttf", 24)
-            p_score = my_font.render_to(screen,(500,20),("Score : %s" % score),(200,50,0))
+            my_font.render_to(screen,(500,20),("Score : %s" % score),(200,50,0))
+            my_font.render_to(screen,(500,60),("Tries : %s" % tries),(200,50,0))
+            my_font.render_to(screen,(500,100),("Combo : %s" % combo),(200,50,0))
             my_font = pygame.freetype.Font("comic.ttf", 15)
 
             pygame.draw.rect(screen,(0,0,0), (520, 400, 60, 20), 1)
@@ -207,12 +229,25 @@ while (True):
 
                 compare = []
                 score += 100
+                combo += 1
+                tries += 1
                 penality = 0
 
-                screen.fill((0, 40, 0), (500,20,200,40))
+                screen.fill((0, 40, 0), (500,20,200,300))
                 my_font = pygame.freetype.Font("comic.ttf", 24)
-                p_score = my_font.render_to(screen,(500,20),("Score : %s" % score),(200,50,0))
+                my_font.render_to(screen,(500,20),("Score : %s" % score),(200,50,0))
+                my_font.render_to(screen,(500,60),("Tries : %s" % tries),(200,50,0))
+                if (combo < 5):
+                    my_font.render_to(screen,(500,100),("Combo : %s" % combo),(200,50,0))
+                elif (combo >= 5):
+                    my_font.render_to(screen,(500,100),("Combo : %s" % combo),(200,50,0))
+                    my_font.render_to(screen,(500,140),("COMBO"),(200,50,0))
+                    my_font.render_to(screen,(500,180),("BREAKER !!"),(200,50,0))
                 my_font = pygame.freetype.Font("comic.ttf", 15)
+                if (len(ban_list) >= level*2):
+                    my_font = pygame.freetype.Font("comic.ttf", 24)
+                    my_font.render_to(screen,(240,216),("Well played !!!"),(200,50,0))
+                    my_font = pygame.freetype.Font("comic.ttf", 15)
                 pygame.display.flip()
 
             else:
@@ -221,11 +256,15 @@ while (True):
                 compare = []
                 penality += 1
                 score -= 20*penality
+                combo = 0
+                tries += 1
                 if score < 0:
                     score = 0
-                screen.fill((0, 40, 0), (500,20,200,40))
+                screen.fill((0, 40, 0), (500,20,200,300))
                 my_font = pygame.freetype.Font("comic.ttf", 24)
-                p_score = my_font.render_to(screen,(500,20),("Score : %s" % score),(200,50,0))
+                my_font.render_to(screen,(500,20),("Score : %s" % score),(200,50,0))
+                my_font.render_to(screen,(500,60),("Tries : %s" % tries),(200,50,0))
+                my_font.render_to(screen,(500,100),("Combo : %s" % combo),(200,50,0))
                 my_font = pygame.freetype.Font("comic.ttf", 15)
                 pygame.display.flip()
         
