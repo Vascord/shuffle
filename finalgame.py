@@ -93,6 +93,7 @@ def mouse_in_box_menu(level):
         if ((pos_button[0]+100) > mouse_pos[0] > (pos_button[0]) and (pos_button[1]+20) > mouse_pos[1]> (pos_button[1])):
                 if (mouse_click[0]):
                     clicked = True
+                    click.play()
                     return level
 
         pos_button[1] += 40
@@ -117,6 +118,7 @@ def level_choice():
     return cards
 
 pygame.init()
+pygame.mixer.init()
 screen = pygame.display.set_mode((640,480))
 my_font = pygame.freetype.Font("comic.ttf", 15)
 screen.fill((0, 40, 0))
@@ -136,6 +138,10 @@ board = False
 combo = 0
 tries = 0
 senpai = 0
+combo_breaker = 0
+
+music = 0
+click = pygame.mixer.Sound('click.wav')
 
 pos_button = [270,240]
 clicked = False
@@ -176,11 +182,17 @@ while (True):
 
             compare = []
             ban_list = []
+        
+        if (music == 0):
+            pygame.mixer.music.load('menu_music.mp3')
+            pygame.mixer.music.play(-1)
+            music = 1
 
         level = mouse_in_box_menu(level)
 
         if ((600) > mouse_pos[0] > (0) and (220) > mouse_pos[1]> (100) and mouse_click[0]):
             senpai += 1
+            click.play()
             if (senpai == 3):
                 my_font = pygame.freetype.Font("comic.ttf", 18)
                 my_font.render_to(screen,(300,10),("S-Stop clicking on me ... BAKANO !!"),(200,50,0))
@@ -190,17 +202,22 @@ while (True):
             clicked = False
             menu = False
             game_start = True
+            pygame.mixer.music.stop()
+            music = 0
             screen.fill((0,40,0))
 
         pygame.display.flip()
 
         if ((120) > mouse_pos[0] > (20) and (460) > mouse_pos[1] > (440) and mouse_click[0]):
+            click.play()
             exit()
 
         pygame.time.wait(10)
 
     if (game_start):
         if (not board):
+            pygame.mixer.music.load('in-game_music.mp3')
+            pygame.mixer.music.play(-1)
             cards = level_choice()
             shuffle(cards)
 
@@ -238,12 +255,18 @@ while (True):
                 my_font.render_to(screen,(500,20),("Score : %s" % score),(200,50,0))
                 my_font.render_to(screen,(500,60),("Tries : %s" % tries),(200,50,0))
                 if (combo < 5):
+                    pop = pygame.mixer.Sound('pop.wav')
+                    pop.play()
                     my_font.render_to(screen,(500,100),("Combo : %s" % combo),(200,50,0))
                 elif (combo >= 5):
+                    if (combo_breaker == 0):
+                        combo_sound = pygame.mixer.Sound('combo.wav')
+                        combo_sound.play()
+                        combo_breaker = 1
                     my_font.render_to(screen,(500,100),("Combo : %s" % combo),(200,50,0))
                     my_font.render_to(screen,(500,140),("COMBO"),(200,50,0))
                     my_font.render_to(screen,(500,180),("BREAKER !!"),(200,50,0))
-                my_font = pygame.freetype.Font("comic.ttf", 15)
+                    my_font = pygame.freetype.Font("comic.ttf", 15)
                 if (len(ban_list) >= level*2):
                     my_font = pygame.freetype.Font("comic.ttf", 24)
                     my_font.render_to(screen,(240,216),("Well played !!!"),(200,50,0))
@@ -256,10 +279,15 @@ while (True):
                 compare = []
                 penality += 1
                 score -= 20*penality
+                if (combo > 0):
+                    oof = pygame.mixer.Sound('combo_end.wav')
+                    oof.play()
                 combo = 0
                 tries += 1
-                if score < 0:
+                combo_breaker = 0
+                if (score < 0):
                     score = 0
+
                 screen.fill((0, 40, 0), (500,20,200,300))
                 my_font = pygame.freetype.Font("comic.ttf", 24)
                 my_font.render_to(screen,(500,20),("Score : %s" % score),(200,50,0))
@@ -269,7 +297,9 @@ while (True):
                 pygame.display.flip()
         
         if ((600) > mouse_pos[0] > (500) and (420) > mouse_pos[1]> (400) and mouse_click[0]):
+            click.play()
             screen.fill((0,40,0))
+            pygame.mixer.music.stop()
             menu = True
 
         pygame.time.wait(10)
